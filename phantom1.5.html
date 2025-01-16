@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>phantom1.3</title>
+    <title>Phantom</title>
     <style>
         body, html {
             margin: 0;
@@ -23,6 +23,7 @@
             top: 10px;
             left: 10px;
             z-index: 10;
+            display: none;
         }
     </style>
 </head>
@@ -35,6 +36,10 @@
     <div id="content"></div>
 
     <script>
+        const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
+        const controlPanel = document.getElementById('controls');
+        const revealDistance = 50; // Distance from the corner to reveal controls
+
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
             const reader = new FileReader();
@@ -50,7 +55,7 @@
 
         document.getElementById('loadUrl').addEventListener('click', function() {
             const url = document.getElementById('urlInput').value;
-            fetch(url)
+            fetch(PROXY_URL + url)
                 .then(response => {
                     if (!response.ok) {
                         throw new Error('Network response was not ok ' + response.statusText);
@@ -68,8 +73,18 @@
         });
 
         function hideControls() {
-            document.getElementById('controls').style.display = 'none';
+            controlPanel.style.display = 'none';
         }
+
+        function revealControls() {
+            controlPanel.style.display = 'block';
+        }
+
+        document.addEventListener('mousemove', function(event) {
+            if (event.clientX < revealDistance && event.clientY < revealDistance) {
+                revealControls();
+            }
+        });
     </script>
 </body>
 </html>
