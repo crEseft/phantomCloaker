@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Phantom</title>
+    <title>Web Content Viewer</title>
     <style>
         body, html {
             margin: 0;
@@ -36,9 +36,14 @@
     <div id="content"></div>
 
     <script>
-        const PROXY_URL = 'https://cors-anywhere.herokuapp.com/';
-        const controlPanel = document.getElementById('controls');
         const revealDistance = 50; // Distance from the corner to reveal controls
+        const controlPanel = document.getElementById('controls');
+
+        function jsonpCallback(data) {
+            const contentDiv = document.getElementById('content');
+            contentDiv.innerHTML = data.html;
+            hideControls();
+        }
 
         document.getElementById('fileInput').addEventListener('change', function(event) {
             const file = event.target.files[0];
@@ -55,21 +60,9 @@
 
         document.getElementById('loadUrl').addEventListener('click', function() {
             const url = document.getElementById('urlInput').value;
-            fetch(PROXY_URL + url)
-                .then(response => {
-                    if (!response.ok) {
-                        throw new Error('Network response was not ok ' + response.statusText);
-                    }
-                    return response.text();
-                })
-                .then(data => {
-                    const contentDiv = document.getElementById('content');
-                    contentDiv.innerHTML = data;
-                    hideControls();
-                })
-                .catch(error => {
-                    console.error('There was a problem with the fetch operation:', error);
-                });
+            const script = document.createElement('script');
+            script.src = `${url}?callback=jsonpCallback`;
+            document.body.appendChild(script);
         });
 
         function hideControls() {
